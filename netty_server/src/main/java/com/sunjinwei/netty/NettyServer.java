@@ -8,6 +8,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 
 /**
  * @program: com.sunjinwei.netty
@@ -45,7 +47,33 @@ public class NettyServer {
                     }
                 })
                 // 本地绑定一个8000端口
-                .bind(8000);
+                .bind(1000).addListener(new GenericFutureListener<Future<? super Void>>() {
+                    @Override
+                    public void operationComplete(Future<? super Void> future) throws Exception {
+                        if (future.isSuccess()) {
+                            System.out.println("端口绑定成功");
+                        } else {
+                            System.out.println("端口绑定失败");
+                            bind(serverBootstrap, 1001);
+                        }
+                    }
+                });
 
+    }
+
+    private static void bind(ServerBootstrap serverBootstrap, int port) {
+        serverBootstrap.bind(port).addListener(
+                new GenericFutureListener<Future<? super Void>>() {
+                    @Override
+                    public void operationComplete(Future<? super Void> future) throws Exception {
+                        if (future.isSuccess()) {
+                            System.out.println("端口[" + port + "]绑定成功");
+                        } else {
+                            System.out.println("端口[" + port + "]绑定失败");
+                            bind(serverBootstrap, port + 1);
+                        }
+                    }
+                }
+        );
     }
 }
