@@ -1,4 +1,4 @@
-package com.sunjinwei.netty;
+package com.sunjinwei.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
